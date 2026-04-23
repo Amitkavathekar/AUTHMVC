@@ -25,6 +25,7 @@ function Register() {
     await handleRegister(email, password)
     navigate("/login")
   }
+  
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
