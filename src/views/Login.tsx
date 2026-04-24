@@ -8,7 +8,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,  
+  CardTitle,
 } from "../components/ui/card"
 import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
@@ -31,7 +31,7 @@ function Login() {
   const [otp, setOtp] = useState("")
   const [confirmation, setConfirmation] = useState<any>(null)
 
-  // ✅ Email Login
+  // Email Login
   const LoginFunctinality = async () => {
     try {
       await handleLogin(email, password)

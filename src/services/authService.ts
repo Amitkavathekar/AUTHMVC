@@ -1,7 +1,4 @@
-import {
-  auth,
-  googleProvider,
-} from "../config/firebase"
+import { auth, googleProvider } from "../config/firebase"
 
 import {
   createUserWithEmailAndPassword,
@@ -18,10 +15,18 @@ export const registerUser = (email: string, password: string) => {
   return createUserWithEmailAndPassword(auth, email, password)
 }
 
+// // Email login
+// export const loginUser = (email: string, password: string) => {
+//   return signInWithEmailAndPassword(auth, email, password)
+// }
+
 // Email login
-export const loginUser = (email: string, password: string) => {
-  return signInWithEmailAndPassword(auth, email, password)
+export const loginUser = async (email: string, password: string) => {
+  const response = await signInWithEmailAndPassword(auth, email, password)
+  console.log(response)
 }
+
+// Then after this store the token in the localStorage and use it to achieve private and public route functionality
 
 // Google login
 export const loginWithGoogle = () => {
@@ -39,9 +44,9 @@ export const logoutUser = () => {
 }
 
 // OTP Login (Phone)
-declare global {  
+declare global {
   interface Window {
-    recaptchaVerifier?: RecaptchaVerifier;
+    recaptchaVerifier?: RecaptchaVerifier
   }
 }
 
@@ -53,16 +58,16 @@ export const sendOTP = async (phone: string) => {
         size: "invisible",
       },
       auth
-    );
+    )
 
-    await window.recaptchaVerifier.render(); // ⚠️ IMPORTANT
+    await window.recaptchaVerifier.render() // ⚠️ IMPORTANT
   }
 
   const confirmation = await signInWithPhoneNumber(
     auth,
     phone,
     window.recaptchaVerifier
-  );
+  )
 
-  return confirmation;
-};
+  return confirmation
+}

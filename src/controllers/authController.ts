@@ -11,24 +11,24 @@ import { setDoc, doc } from "firebase/firestore"
 import { auth } from "../config/firebase"
 import { createUserWithEmailAndPassword } from "firebase/auth"
 
-// 🔥 NEW ADD (Firestore)
 import { db } from "../config/firebase"
 
-// ✅ REGISTER (UPDATED)
+//Inputs come from UI form
 export const handleRegister = async (
   email: string,
   password: string,
   fullName: string,
   phone: string
 ) => {
+  //Create User in Firebase Auth
   const userCredential = await createUserWithEmailAndPassword(
     auth,
     email,
     password
   )
 
+  //Firebase only stores extra data
   const user = userCredential.user
-
   await updateProfile(user, {
     displayName: fullName,
   })
@@ -59,7 +59,7 @@ export const handleGoogleLogin = async () => {
   try {
     await loginWithGoogle()
     alert("Google login success")
-  } catch (err: any) {
+  } catch (err:any) {
     alert(err.message)
   }
 }
