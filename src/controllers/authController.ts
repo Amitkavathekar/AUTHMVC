@@ -1,20 +1,50 @@
 import {
   loginUser,
-  registerUser,
   loginWithGoogle,
   resetPassword,
   logoutUser,
 } from "../services/authService"
 
-export const handleRegister = async (email: string, password: string) => {
-  try {
-    await registerUser(email, password)
-    alert("Registered successfully")
-  } catch (err: any) {
-    alert(err.message)
-  }
+import { updateProfile } from "firebase/auth"
+import { setDoc, doc } from "firebase/firestore"
+
+import { auth } from "../config/firebase"
+import { createUserWithEmailAndPassword } from "firebase/auth"
+
+// 🔥 NEW ADD (Firestore)
+import { db } from "../config/firebase"
+
+// ✅ REGISTER (UPDATED)
+export const handleRegister = async (
+  email: string,
+  password: string,
+  fullName: string,
+  phone: string
+) => {
+  const userCredential = await createUserWithEmailAndPassword(
+    auth,
+    email,
+    password
+  )
+
+  const user = userCredential.user
+
+  await updateProfile(user, {
+    displayName: fullName,
+  })
+
+  await setDoc(doc(db, "users", user.uid), {
+    uid: user.uid,
+    fullName,
+    email,
+    phone,
+    createdAt: new Date(),
+  })
+
+  return user
 }
 
+// LOGIN
 export const handleLogin = async (email: string, password: string) => {
   try {
     await loginUser(email, password)
@@ -24,6 +54,7 @@ export const handleLogin = async (email: string, password: string) => {
   }
 }
 
+// GOOGLE LOGIN
 export const handleGoogleLogin = async () => {
   try {
     await loginWithGoogle()
@@ -33,6 +64,7 @@ export const handleGoogleLogin = async () => {
   }
 }
 
+// RESET
 export const handleReset = async (email: string) => {
   try {
     await resetPassword(email)
@@ -42,6 +74,7 @@ export const handleReset = async (email: string) => {
   }
 }
 
+// LOGOUT
 export const handleLogout = async () => {
   await logoutUser()
 }

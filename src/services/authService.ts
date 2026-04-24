@@ -39,10 +39,30 @@ export const logoutUser = () => {
 }
 
 // OTP Login (Phone)
-export const sendOTP = (phone: string) => {
-  const recaptcha = new RecaptchaVerifier(auth, "recaptcha", {
-    size: "invisible",
-  })
-
-  return signInWithPhoneNumber(auth, phone, recaptcha)
+declare global {  
+  interface Window {
+    recaptchaVerifier?: RecaptchaVerifier;
+  }
 }
+
+export const sendOTP = async (phone: string) => {
+  if (!window.recaptchaVerifier) {
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      "recaptcha",
+      {
+        size: "invisible",
+      },
+      auth
+    );
+
+    await window.recaptchaVerifier.render(); // ⚠️ IMPORTANT
+  }
+
+  const confirmation = await signInWithPhoneNumber(
+    auth,
+    phone,
+    window.recaptchaVerifier
+  );
+
+  return confirmation;
+};

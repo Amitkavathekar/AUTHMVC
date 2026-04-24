@@ -20,12 +20,25 @@ function Register() {
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [fullName, setFullName] = useState("")
+  const [phone, setPhone] = useState("")
 
   const Registerfunctionality = async () => {
-    await handleRegister(email, password)
-    navigate("/login")
+    try {
+      if (!email || !password || !fullName || !phone) {
+        alert("All fields required")
+        return
+      }
+
+      await handleRegister(email, password, fullName, phone)
+
+      alert("Registered Successfully ✅")
+      navigate("/login")
+    } catch (err: any) {
+      console.error(err)
+      alert(err.message)
+    }
   }
-  
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
@@ -44,6 +57,23 @@ function Register() {
 
         <CardContent>
           <div className="flex flex-col gap-4">
+            <div className="grid gap-2">
+              <Label>Full Name</Label>
+              <Input
+                type="text"
+                placeholder="John Doe"
+                onChange={(e) => setFullName(e.target.value)}
+              />
+            </div>
+
+            <div className="grid gap-2">
+              <Label>Mobile Number</Label>
+              <Input
+                type="text"
+                placeholder="+919876543210"
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            </div>
             <div className="grid gap-2">
               <Label>Email</Label>
               <Input
