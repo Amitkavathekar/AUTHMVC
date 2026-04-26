@@ -6,13 +6,13 @@ import Dashboard from "../views//Dashboard"
 
 function AppRoutes() {
   return (
-     <Routes>
+    <Routes>
       <Route path="/register" element={<Register />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/" element={<Login />} />
       <Route path="/forgot" element={<ForgotPassword />} />
       <Route path="/dashboard" element={<Dashboard />} />
     </Routes>
-
   )
 }
 
