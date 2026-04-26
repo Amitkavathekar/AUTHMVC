@@ -53,12 +53,12 @@ declare global {
 export const sendOTP = async (phone: string) => {
   if (!window.recaptchaVerifier) {
     window.recaptchaVerifier = new RecaptchaVerifier(
-      "recaptcha",
-      {
-        size: "invisible",
-      },
-      auth
-    )
+  auth,
+  "recaptcha",
+  {
+    size: "invisible",
+  }
+)
 
     await window.recaptchaVerifier.render() // ⚠️ IMPORTANT
   }
