@@ -15,18 +15,13 @@ export const registerUser = (email: string, password: string) => {
   return createUserWithEmailAndPassword(auth, email, password)
 }
 
-// // Email login
-// export const loginUser = (email: string, password: string) => {
-//   return signInWithEmailAndPassword(auth, email, password)
-// }
 
 // Email login
 export const loginUser = async (email: string, password: string) => {
   const response = await signInWithEmailAndPassword(auth, email, password)
-  console.log(response)
+  return response
 }
 
-// Then after this store the token in the localStorage and use it to achieve private and public route functionality
 
 // Google login
 export const loginWithGoogle = () => {
@@ -51,7 +46,14 @@ declare global {
 }
 
 export const sendOTP = async (phone: string) => {
-  if (!window.recaptchaVerifier) {
+  try {
+    //  REMOVE OLD recaptcha DOM manually
+    const recaptchaContainer = document.getElementById("recaptcha")
+    if (recaptchaContainer) {
+      recaptchaContainer.innerHTML = ""
+    }
+
+    //  CREATE NEW verifier
     window.recaptchaVerifier = new RecaptchaVerifier(
       auth,
       "recaptcha",
@@ -60,14 +62,15 @@ export const sendOTP = async (phone: string) => {
       }
     )
 
-    await window.recaptchaVerifier.render() // ⚠️ IMPORTANT
+    const confirmation = await signInWithPhoneNumber(
+      auth,
+      phone,
+      window.recaptchaVerifier
+    )
+
+    return confirmation
+  } catch (error) {
+    console.error("OTP ERROR:", error)
+    throw error
   }
-
-  const confirmation = await signInWithPhoneNumber(
-    auth,
-    phone,
-    window.recaptchaVerifier
-  )
-
-  return confirmation
 }

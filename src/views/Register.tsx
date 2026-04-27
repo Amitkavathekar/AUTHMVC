@@ -32,7 +32,7 @@ function Register() {
 
       await handleRegister(email, password, fullName, phone)
 
-      alert("Registered Successfully ✅")
+      alert("Registered Successfully ")
       navigate("/login")
     } catch (err: any) {
       console.error(err)
