@@ -23,7 +23,6 @@ function Login() {
   const navigate = useNavigate()
 
   const [mode, setMode] = useState<"email" | "mobile">("email")
-
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [phone, setPhone] = useState<string | undefined>()
