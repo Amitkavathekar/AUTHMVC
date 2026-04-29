@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate, Link } from "react-router-dom"
 import "react-phone-number-input/style.css"
 import PhoneInput from "react-phone-number-input"
@@ -16,8 +16,12 @@ import { Input } from "../components/ui/input"
 import { Label } from "../components/ui/label"
 
 import { handleLogin, handleGoogleLogin } from "../controllers/authController"
-
 import { sendOTP } from "../services/authService"
+
+import { auth } from "../config/firebase"
+
+// 1 day (24 hr) in milliseconds
+const LOGIN_EXPIRY_MS = 24 * 60 * 60 * 1000;
 
 function Login() {
   const navigate = useNavigate()
@@ -27,27 +31,52 @@ function Login() {
   const [password, setPassword] = useState("")
   const [phone, setPhone] = useState<string | undefined>()
   const [otp, setOtp] = useState("")
-  const [confirmation, setConfirmation] = useState<any>(null)
+  const [confirmation, setConfirmation] = useState<firebase.auth.ConfirmationResult | null>(null)
+
+  // Check login and expiry on mount
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        // Check for expiry
+        const loginTimeStr = localStorage.getItem("loginTime");
+        const loginTime = loginTimeStr ? parseInt(loginTimeStr, 10) : null;
+        const currentTime = Date.now();
+
+        if (loginTime && currentTime - loginTime < LOGIN_EXPIRY_MS) {
+          // Not expired
+          navigate("/dashboard", { replace: true });
+        } else if (loginTime) {
+          // Expired -- sign out and clear time
+          await auth.signOut();
+          localStorage.removeItem("loginTime");
+        } // else, let user login
+      }
+    });
+    return () => unsubscribe();
+    // eslint-disable-next-line
+  }, [navigate]);
 
   // Email Login
   const LoginFunctinality = async () => {
     try {
       await handleLogin(email, password)
+      localStorage.setItem("loginTime", Date.now().toString())
       alert("Email Login Successful!")
       navigate("/dashboard")
     } catch (err: any) {
-      alert(err.message)
+      alert((err as Error).message)
     }
   }
 
-  //  Google Login
+  // Google Login
   const googleLoginHandler = async () => {
     try {
       await handleGoogleLogin()
+      localStorage.setItem("loginTime", Date.now().toString())
       alert(" Google Login Successful!")
       navigate("/dashboard")
     } catch (err: any) {
-      alert(err.message)
+      alert((err as Error).message)
     }
   }
 
@@ -58,28 +87,26 @@ function Login() {
       return
     }
 
-    console.log("PHONE:", phone)
-
     try {
       const confirm = await sendOTP(phone)
       setConfirmation(confirm)
       alert(" OTP Sent Successfully!")
     } catch (err: any) {
       console.error(err)
-      alert(+err.message)
+      alert((err as Error).message)
     }
   }
 
-  //  Verify OTP Login
+  // Verify OTP Login
   const verifyOTP = async () => {
     try {
       if (!confirmation) return alert("⚠️ Please send OTP first")
-
       await confirmation.confirm(otp)
+      localStorage.setItem("loginTime", Date.now().toString())
       alert("OTP Login Successful!")
       navigate("/dashboard")
     } catch (err: any) {
-      alert(err.message)
+      alert((err as Error).message)
     }
   }
 
