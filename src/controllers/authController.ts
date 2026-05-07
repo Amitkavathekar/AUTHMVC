@@ -5,13 +5,15 @@ import {
   logoutUser,
 } from "../services/authService"
 
-import { updateProfile } from "firebase/auth"
+// Only import what is not re-exported from firebase/config
+import { updateProfile, createUserWithEmailAndPassword } from "firebase/auth"
 import { setDoc, doc } from "firebase/firestore"
 
-import { auth } from "../config/firebase"
-import { createUserWithEmailAndPassword } from "firebase/auth"
+import * as firebaseConfig from "../config/firebase"
+import { toast } from "sonner"
 
-import { db } from "../config/firebase"
+// Use destructuring to avoid duplicate import/identifier issues
+const { auth, db, RecaptchaVerifier, signInWithPhoneNumber } = firebaseConfig
 
 //Inputs come from UI form
 export const handleRegister = async (
@@ -44,13 +46,19 @@ export const handleRegister = async (
   return user
 }
 
-// LOGIN
-export const handleLogin = async (email: string, password: string) => {
+// Helper: show toast for async operation result
+const showToastOnOperation = async (
+  operation: () => Promise<unknown>,
+  successMsg: string,
+  warningOverride?: string
+) => {
   try {
-    await loginUser(email, password)
-    alert("Login successful")
-  } catch (err: any) {
-    alert(err.message)
+    await operation()
+    toast.success(successMsg, { position: "top-right" })
+  } catch (err: unknown) {
+    const message =
+      warningOverride || (err instanceof Error ? err.message : "Error occurred")
+    toast.warning(message, { position: "top-right" })
   }
 }
 
@@ -58,9 +66,11 @@ export const handleLogin = async (email: string, password: string) => {
 export const handleGoogleLogin = async () => {
   try {
     await loginWithGoogle()
-    alert("Google login success")
-  } catch (err:any) {
-    alert(err.message)
+    toast.success("Google login success", { position: "top-right" })
+  } catch (err: unknown) {
+    toast.warning(err instanceof Error ? err.message : "Google login failed", {
+      position: "top-right",
+    })
   }
 }
 
@@ -68,13 +78,88 @@ export const handleGoogleLogin = async () => {
 export const handleReset = async (email: string) => {
   try {
     await resetPassword(email)
-    alert("Reset email sent")
-  } catch (err: any) {
-    alert(err.message)
+    toast.success("Reset link sent to your email", { position: "top-right" })
+  } catch (err: unknown) {
+    toast.warning(err instanceof Error ? err.message : "Reset failed", {
+      position: "top-right",
+    })
   }
 }
 
 // LOGOUT
 export const handleLogout = async () => {
   await logoutUser()
+}
+
+//mobile otp login
+
+// Setup Recaptcha
+export const setupRecaptcha = () => {
+  if (window.recaptchaVerifier) {
+    return
+  }
+
+  window.recaptchaVerifier = new RecaptchaVerifier(
+    auth,
+    "recaptcha-container",
+    {
+      size: "normal",
+    }
+  )
+}
+
+// Send OTP
+export const sendOtp = async (phoneNumber: string) => {
+  try {
+    setupRecaptcha()
+
+    const appVerifier = window.recaptchaVerifier
+
+    const confirmationResult = await signInWithPhoneNumber(
+      auth,
+      phoneNumber,
+      appVerifier
+    )
+
+    window.confirmationResult = confirmationResult
+
+    // Captcha gayab karava (remove recaptcha from DOM after OTP sent)
+    const recaptchaElem = document.getElementById("recaptcha-container")
+    if (recaptchaElem) {
+      recaptchaElem.innerHTML = ""
+    }
+    // Optionally, remove verifier as well to clear memory/reference
+    window.recaptchaVerifier = undefined
+
+    return {
+      success: true,
+    }
+  } catch (error: unknown) {
+    // eslint-disable-next-line no-console
+    console.log(error)
+
+    return {
+      success: false,
+      message: error instanceof Error ? error.message : "Failed to send OTP",
+    }
+  }
+}
+
+// Verify OTP
+export const verifyOtp = async (otp: string) => {
+  try {
+    const result = await window.confirmationResult.confirm(otp)
+
+    const token = await result.user.getIdToken()
+
+    return {
+      success: true,
+      token,
+      user: result.user,
+    }
+  } catch (error) {
+    return {
+      success: false,
+    }
+  }
 }

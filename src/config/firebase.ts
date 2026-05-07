@@ -1,7 +1,13 @@
-import { initializeApp } from "firebase/app"
-import { getAuth, GoogleAuthProvider } from "firebase/auth"
-import { getFirestore } from "firebase/firestore"
-import { getStorage } from "firebase/storage"
+// ho, ha code TypeScript (ts) madhe ahe.
+
+import { initializeApp } from "firebase/app";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  RecaptchaVerifier,  signInWithPhoneNumber
+} from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
+import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB_5AwlmvvC_1Q4GnDpgIcVu6kAko51jEQ",
@@ -10,11 +16,15 @@ const firebaseConfig = {
   storageBucket: "authmvc-8c80b.firebasestorage.app",
   messagingSenderId: "199845498046",
   appId: "1:199845498046:web:dc04ae9392d002feeb62ef",
-}
+};
 
-const app = initializeApp(firebaseConfig)
+const app = initializeApp(firebaseConfig);
 
-export const auth = getAuth(app)
-export const googleProvider = new GoogleAuthProvider()
-export const db = getFirestore(app)
-export const storage = getStorage(app)
+export const auth = getAuth(app);
+export const googleProvider = new GoogleAuthProvider();
+export const db = getFirestore(app);
+export const storage = getStorage(app);
+export {
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+};

@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react"
-import { storage } from "@/config/firebase"
 import {
   Sidebar,
   SidebarContent,
@@ -12,7 +11,6 @@ import {
 } from "@/components/ui/sidebar"
 
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
-import { Input } from "@/components/ui/input"
 
 import { Home, User, Settings, LogOut } from "lucide-react"
 
