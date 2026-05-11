@@ -66,7 +66,6 @@ function Login() {
   const [emailError, setEmailError] = useState<string>("")
   const [passwordError, setPasswordError] = useState<string>("")
   const [phoneError, setPhoneError] = useState<string>("")
-  const [otpError] = useState<string>("")
 
   // Spinner loading state
 
@@ -112,7 +111,7 @@ function Login() {
     const toValidate = typeof p === "string" ? p : password
     if (!toValidate) return "Password is required."
     if (!passwordPattern.test(toValidate))
-      return "Must contain uppercase, number & special character."
+      return "Please enter a valid Password "
     return ""
   }
   const validatePhone = (ph?: string) => {
@@ -269,246 +268,235 @@ function Login() {
         className="flex h-screen w-[60%] items-center justify-center border-none"
         style={{ backgroundColor: "#F5F5F5" }}
       >
+        <Card className="w-full max-w-sm !border-0 !bg-transparent shadow-none !outline-none">
+          <CardHeader>
+            <CardTitle className="text-2xl">Welcome back!</CardTitle>
+            <CardDescription className="text-black">
+              {mode === "email"
+                ? "Enter your Credentials to access your account"
+                : "Login using your mobile and OTP"}
+            </CardDescription>
 
-         
-          <Card className="w-full max-w-sm !border-0 !bg-transparent shadow-none !outline-none">
-            <CardHeader>
-              <CardTitle className="text-2xl">Welcome back!</CardTitle>
-              <CardDescription className="text-black">
-                {mode === "email"
-                  ? "Enter your Credentials to access your account"
-                  : "Login using your mobile and OTP"}
-              </CardDescription>
+            <div className="relative mt-3 flex w-full rounded-lg bg-[#EBE9E3] p-1">
+              <div
+                className={`absolute top-1 bottom-1 w-1/2 rounded-md bg-white shadow transition-all duration-300 ${
+                  mode === "email" ? "left-1" : "left-1/2"
+                }`}
+              ></div>
+              <button
+                onClick={() => setMode("email")}
+                className={`relative z-10 w-1/2 py-2 ${
+                  mode === "email"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+                type="button"
+              >
+                Email
+              </button>
+              <button
+                onClick={() => setMode("mobile")}
+                className={`relative z-10 w-1/2 py-2 ${
+                  mode === "mobile"
+                    ? "font-semibold text-black"
+                    : "text-gray-500"
+                }`}
+                type="button"
+              >
+                Mobile
+              </button>
+            </div>
+          </CardHeader>
 
-              <div className="relative mt-3 flex w-full rounded-lg bg-[#EBE9E3] p-1">
-                <div
-                  className={`absolute top-1 bottom-1 w-1/2 rounded-md bg-white shadow transition-all duration-300 ${
-                    mode === "email" ? "left-1" : "left-1/2"
-                  }`}
-                ></div>
-                <button
-                  onClick={() => setMode("email")}
-                  className={`relative z-10 w-1/2 py-2 ${
-                    mode === "email"
-                      ? "font-semibold text-black"
-                      : "text-gray-500"
-                  }`}
-                  type="button"
-                >
-                  Email
-                </button>
-                <button
-                  onClick={() => setMode("mobile")}
-                  className={`relative z-10 w-1/2 py-2 ${
-                    mode === "mobile"
-                      ? "font-semibold text-black"
-                      : "text-gray-500"
-                  }`}
-                  type="button"
-                >
-                  Mobile
-                </button>
-              </div>
-            </CardHeader>
+          <CardContent>
+            <div className="flex flex-col gap-4">
+              {mode === "email" && (
+                <>
+                  <div className="grid gap-2">
+                    <Label>Email</Label>
+                    <Input
+                      type="email"
+                      placeholder="m@example.com"
+                      value={email}
+                      className="border border-gray-300"
+                      onChange={(e) => {
+                        setEmail(e.target.value)
+                        setEmailError(validateEmail(e.target.value))
+                      }}
+                      onBlur={(e) =>
+                        setEmailError(validateEmail(e.target.value))
+                      }
+                    />
+                    {emailError && (
+                      <span className="text-sm text-red-500">{emailError}</span>
+                    )}
+                  </div>
 
-            <CardContent>
-              <div className="flex flex-col gap-4">
-                {mode === "email" && (
-                  <>
-                    <div className="grid gap-2">
-                      <Label>Email</Label>
+                  <div className="grid gap-2">
+                    <div className="flex justify-between">
+                      <Label>Password</Label>
+                      <Link
+                        to="/forgot"
+                        className="text-sm text-[#0F3DDE] hover:underline"
+                      >
+                        Forgot Password?
+                      </Link>
+                    </div>
+                    <div className="relative">
                       <Input
-                        type="email"
-                        placeholder="m@example.com"
-                        value={email}
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
                         className="border border-gray-300"
+                        value={password}
                         onChange={(e) => {
-                          setEmail(e.target.value)
-                          setEmailError(validateEmail(e.target.value))
+                          setPassword(e.target.value)
+                          setPasswordError(validatePassword(e.target.value))
                         }}
                         onBlur={(e) =>
-                          setEmailError(validateEmail(e.target.value))
+                          setPasswordError(validatePassword(e.target.value))
                         }
                       />
-                      {emailError && (
-                        <span className="text-sm text-red-500">
-                          {emailError}
-                        </span>
-                      )}
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((prev) => !prev)}
+                        className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
+                        tabIndex={-1}
+                      >
+                        {showPassword ? (
+                          <EyeOff size={18} />
+                        ) : (
+                          <Eye size={18} />
+                        )}
+                      </button>
                     </div>
+                    {passwordError && (
+                      <span className="text-sm text-red-500">
+                        {passwordError}
+                      </span>
+                    )}
+                  </div>
+                </>
+              )}
 
-                    <div className="grid gap-2">
-                      <div className="flex justify-between">
-                        <Label>Password</Label>
-                        <Link
-                          to="/forgot"
-                          className="text-sm text-[#0F3DDE] hover:underline"
-                        >
-                          Forgot Password?
-                        </Link>
-                      </div>
-                      <div className="relative">
-                        <Input
-                          type={showPassword ? "text" : "password"}
-                          placeholder="Enter your password"
-                          className="border border-gray-300"
-                          value={password}
-                          onChange={(e) => {
-                            setPassword(e.target.value)
-                            setPasswordError(validatePassword(e.target.value))
-                          }}
-                          onBlur={(e) =>
-                            setPasswordError(validatePassword(e.target.value))
-                          }
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword((prev) => !prev)}
-                          className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-500"
-                          tabIndex={-1}
-                        >
-                          {showPassword ? (
-                            <EyeOff size={18} />
-                          ) : (
-                            <Eye size={18} />
-                          )}
-                        </button>
-                      </div>
-                      {passwordError && (
-                        <span className="text-sm text-red-500">
-                          {passwordError}
-                        </span>
-                      )}
-                    </div>
-                  </>
-                )}
+              {mode === "mobile" && (
+                <div className="flex w-full flex-col items-center">
+                  <div className="grid w-full gap-2">
+                    <Label className="mb-2">Enter Mobile Number</Label>
+                    <div className="relative flex w-full justify-center">
+                      <PhoneInput
+                        country={"in"}
+                        inputProps={{
+                          autoFocus: true,
+                        }}
+                        value={phone}
+                        onChange={async (value: string) => {
+                          const ph = value.startsWith("+") ? value : "+" + value
 
-                {mode === "mobile" && (
-                  <div className="flex w-full flex-col items-center">
-                    <div className="grid w-full gap-2">
-                      <Label className="mb-2">Enter Mobile Number</Label>
-                      <div className="relative flex w-full justify-center">
-                        <PhoneInput
-                          country={"in"}
-                          inputProps={{
-                            autoFocus: true,
-                          }}
-                          value={phone}
-                          onChange={async (value: string) => {
-                            const ph = value.startsWith("+")
-                              ? value
-                              : "+" + value
+                          setPhone(ph)
 
-                            setPhone(ph)
+                          setTimeout(() => {
+                            const input = document.querySelector(
+                              ".react-tel-input input"
+                            ) as HTMLInputElement
 
-                            setTimeout(() => {
-                              const input = document.querySelector(
-                                ".react-tel-input input"
-                              ) as HTMLInputElement
+                            input?.focus()
+                          }, 0)
 
-                              input?.focus()
-                            }, 0)
+                          setPhoneError(validatePhone(ph))
 
-                            setPhoneError(validatePhone(ph))
+                          if (ph.length === 13 && !window.confirmationResult) {
+                            const result = await sendOtp(ph)
 
-                            if (
-                              ph.length === 13 &&
-                              !window.confirmationResult
-                            ) {
-                              const result = await sendOtp(ph)
-
-                              if (result.success) {
-                                toast.success(`OTP sent to ${ph}`, {
-                                  position: "top-right",
-                                })
-                              } else {
-                                toast.warning(result.message, {
-                                  position: "top-right",
-                                })
-                              }
+                            if (result.success) {
+                              toast.success(`OTP sent to ${ph}`, {
+                                position: "top-right",
+                              })
+                            } else {
+                              toast.warning(result.message, {
+                                position: "top-right",
+                              })
                             }
-                          }}
-                          onBlur={() => setPhoneError(validatePhone(phone))}
-                          placeholder="Enter phone number"
-                          enableSearch
-                          countryCodeEditable={false}
-                          enableClickOutside={true}
-                          containerClass="!w-[210px]"
-                          inputClass="!w-[250px] !h-8 !rounded-md !text-sm !pl-12 !border !border-gray-300 !bg-transparent"
-                          buttonClass="!bg-transparent !bg-transparent !border-gray-300"
-                          dropdownClass="!text-black !w-[250px]"
-                          searchClass="!w-full !p-2"
-                        />
-                      </div>
-                      {phoneError && (
-                        <span className="m-auto text-sm text-red-500">
-                          {phoneError}
-                        </span>
-                      )}
+                          }
+                        }}
+                        onBlur={() => setPhoneError(validatePhone(phone))}
+                        placeholder="Enter phone number"
+                        enableSearch
+                        countryCodeEditable={false}
+                        enableClickOutside={true}
+                        containerClass="!w-[210px]"
+                        inputClass="!w-[250px] !h-8 !rounded-md !text-sm !pl-12 !border !border-gray-300 !bg-transparent"
+                        buttonClass="!bg-transparent !bg-transparent !border-gray-300"
+                        dropdownClass="!text-black !w-[250px]"
+                        searchClass="!w-full !p-2"
+                      />
                     </div>
-                    {/* Move reCAPTCHA popup margin from left to right */}
-                    <div className="mt-4 flex justify-center w-full ">
-                      <div className="scale-90 " id="recaptcha-container"></div>
-                    </div>
+                    {phoneError && (
+                      <span className="m-auto text-sm text-red-500">
+                        {phoneError}
+                      </span>
+                    )}
+                  </div>
+                  {/* Move reCAPTCHA popup margin from left to right */}
+                  <div className="mt-4 flex w-full justify-center">
+                    <div className="scale-90" id="recaptcha-container"></div>
+                  </div>
 
-                    <div className="grid w-full max-w-xs gap-2">
-                      <Label className="mt-2 mb-2">Enter OTP</Label>
-                      <div className="flex justify-center">
-                        <InputOTP
-                          maxLength={6}
-                          pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
-                          value={otp}
-                          onChange={setOtp}
-                        >
-                          <InputOTPGroup className="border-gray-1000 border">
-                            <InputOTPSlot index={0} />
-                            <InputOTPSlot index={1} />
-                            <InputOTPSlot index={2} />
-                          </InputOTPGroup>
-                          <InputOTPSeparator />
-                          <InputOTPGroup className="border-gray-1000 border">
-                            <InputOTPSlot index={3} />
-                            <InputOTPSlot index={4} />
-                            <InputOTPSlot index={5} />
-                          </InputOTPGroup>
-                        </InputOTP>
-                      </div>
+                  <div className="grid w-full max-w-xs gap-2">
+                    <Label className="mt-2 mb-2">Enter OTP</Label>
+                    <div className="flex justify-center">
+                      <InputOTP
+                        maxLength={6}
+                        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+                        value={otp}
+                        onChange={setOtp}
+                      >
+                        <InputOTPGroup className="border-gray-1000 border">
+                          <InputOTPSlot index={0} />
+                          <InputOTPSlot index={1} />
+                          <InputOTPSlot index={2} />
+                        </InputOTPGroup>
+                        <InputOTPSeparator />
+                        <InputOTPGroup className="border-gray-1000 border">
+                          <InputOTPSlot index={3} />
+                          <InputOTPSlot index={4} />
+                          <InputOTPSlot index={5} />
+                        </InputOTPGroup>
+                      </InputOTP>
                     </div>
                   </div>
-                )}
-              </div>
-            </CardContent>
+                </div>
+              )}
+            </div>
+          </CardContent>
 
-            <CardFooter className="flex flex-col gap-2">
-              <Button
-                className="w-full bg-[#3A5B22]"
-                onClick={
-                  mode === "email" ? loginFunctionality : handleVerifyOtp
-                }
+          <CardFooter className="flex flex-col gap-2">
+            <Button
+              className="w-full bg-[#3A5B22]"
+              onClick={mode === "email" ? loginFunctionality : handleVerifyOtp}
+            >
+              {mode === "email" ? "Login" : "Verify with OTP"}
+            </Button>
+            <Button
+              variant="outline"
+              className="w-full border border-gray-200"
+              onClick={googleLoginHandler}
+            >
+              <FcGoogle />
+              Login with Google
+            </Button>
+            <div className="mt-1">
+              <span className="text-black no-underline">
+                Don't have an account?{" "}
+              </span>
+              <Link
+                to="/register"
+                className="mt-2 text-sm text-[#0F3DDE] hover:underline"
               >
-                {mode === "email" ? "Login" : "Verify with OTP"}
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border border-gray-200"
-                onClick={googleLoginHandler}
-              >
-                <FcGoogle />
-                Login with Google
-              </Button>
-              <div className="mt-1">
-                <span className="text-black no-underline">
-                  Don't have an account?{" "}
-                </span>
-                <Link
-                  to="/register"
-                  className="mt-2 text-sm text-[#0F3DDE] hover:underline"
-                >
-                  Sign up
-                </Link>
-              </div>
-            </CardFooter>
-          </Card>
+                Sign up
+              </Link>
+            </div>
+          </CardFooter>
+        </Card>
       </div>
       <img src={tree} className="w-[45%] bg-cover" alt="tree" />
     </div>

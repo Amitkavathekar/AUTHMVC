@@ -55,6 +55,14 @@ function Register() {
       // Register with Firebase
       const user = await handleRegister(email, password, fullName, phone)
 
+      // Print Firebase unique idToken to console
+      if (user && user.getIdToken) {
+        const idToken = await user.getIdToken()
+        console.log("Firebase idToken:", idToken)
+      } else {
+        console.log("Firebase uid:", user?.uid || "No user.uid available")
+      }
+
       // Save user to Mock API
       const response = await axios.post(
         "https://69fae18488a7af0ecca7e2e4.mockapi.io/api/v1/user",

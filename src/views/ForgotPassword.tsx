@@ -29,7 +29,7 @@ function ForgotPassword() {
   return (
     <div className="flex h-screen w-full">
       <div className="flex w-full bg-[#F5F5F5]">
-        <div className="flex h-screen  items-center w-[60%]  justify-center bg-[#F5F5F5]">
+        <div className="flex h-screen w-[60%] items-center justify-center bg-[#F5F5F5]">
           <Card className="w-full max-w-sm shadow-lg">
             <CardHeader>
               <CardTitle>Reset Password</CardTitle>
@@ -59,13 +59,16 @@ function ForgotPassword() {
             </CardContent>
 
             <CardFooter className="flex flex-col gap-2">
-              <Button className="w-full bg-[#3A5B22]" onClick={ResetFuntinality}>
+              <Button
+                className="w-full bg-[#3A5B22]"
+                onClick={ResetFuntinality}
+              >
                 Send Reset Email
               </Button>
 
               <Button
                 variant="outline"
-                className="w-full "
+                className="w-full"
                 onClick={() => navigate("/login")}
               >
                 Go to Login

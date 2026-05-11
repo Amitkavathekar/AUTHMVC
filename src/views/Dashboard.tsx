@@ -19,7 +19,6 @@ import { Input } from "@/components/ui/input"
 import ProfilePage from "@/views/ProfilePage.jsx"
 import SettingsPage from "@/views/SettingsPage.jsx"
 
-// Extended UserData to include all fields specified in the prompt
 type UserData = {
   id: string
   email: string
@@ -34,7 +33,6 @@ type UserData = {
 function Dashboard() {
   const navigate = useNavigate()
 
-  // Set default user (to match the "Amit Annappa Kavathekar" example)
   const [user] = useState<UserData | null>({
     id: "2",
     email: "amitkavathekar@gmail.com",
@@ -53,7 +51,6 @@ function Dashboard() {
   const [apiError, setApiError] = useState<string | null>(null)
   const [deleteLoading, setDeleteLoading] = useState<string | null>(null)
 
-  // State for editing user dialog
   const [editDialogOpen, setEditDialogOpen] = useState(false)
   const [editUser, setEditUser] = useState<UserData | null>(null)
   const [editForm, setEditForm] = useState<Partial<UserData>>({})
@@ -65,7 +62,6 @@ function Dashboard() {
     navigate("/login")
   }
 
-  // Simulate loading for the dashboard
   useEffect(() => {
     const timer = setTimeout(() => {
       setLoading(false)
@@ -73,7 +69,7 @@ function Dashboard() {
     return () => clearTimeout(timer)
   }, [])
 
-  // API sathi axios vaparla aahe:
+  // Shortened error handling per request
   const fetchApiData = async () => {
     setApiLoading(true)
     setApiError(null)
@@ -82,21 +78,8 @@ function Dashboard() {
         "https://69fae18488a7af0ecca7e2e4.mockapi.io/api/v1/user"
       )
       setApiData(response.data)
-    } catch (err) {
-      let errorMsg = "Failed to fetch users."
-      if (
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof (err as { response?: { data?: { message?: string } } }).response
-          ?.data?.message === "string"
-      ) {
-        errorMsg = (err as { response?: { data?: { message?: string } } })
-          .response!.data!.message!
-      } else if (err instanceof Error) {
-        errorMsg = err.message
-      }
-      setApiError(errorMsg)
+    } catch (err: any) {
+      setApiError(err?.message || "Failed to fetch users.")
     } finally {
       setApiLoading(false)
     }
@@ -106,7 +89,6 @@ function Dashboard() {
     fetchApiData()
   }, [])
 
-  // Edit User
   const handleEditUser = (userId: string) => {
     const userToEdit = apiData.find((u) => u.id === userId)
     if (userToEdit) {
@@ -141,28 +123,14 @@ function Dashboard() {
         `https://69fae18488a7af0ecca7e2e4.mockapi.io/api/v1/user/${editUser.id}`,
         editForm
       )
-      // Update user in local state
       setApiData((prev) =>
         prev.map((u) => (u.id === editUser.id ? resp.data : u))
       )
       setEditDialogOpen(false)
       setEditUser(null)
       setEditForm({})
-    } catch (err) {
-      let errorMsg = "Failed to update user."
-      if (
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof (err as { response?: { data?: { message?: string } } }).response
-          ?.data?.message === "string"
-      ) {
-        errorMsg = (err as { response?: { data?: { message?: string } } })
-          .response!.data!.message!
-      } else if (err instanceof Error) {
-        errorMsg = err.message
-      }
-      setEditError(errorMsg)
+    } catch (err: any) {
+      setEditError(err?.message || "Failed to update user.")
     } finally {
       setEditSaving(false)
     }
@@ -181,23 +149,9 @@ function Dashboard() {
       await axios.delete(
         `https://69fae18488a7af0ecca7e2e4.mockapi.io/api/v1/user/${userId}`
       )
-      // Refresh the user list after deletion
       setApiData((prev) => prev.filter((user) => user.id !== userId))
-    } catch (err) {
-      let errorMsg = "Failed to delete user."
-      if (
-        typeof err === "object" &&
-        err !== null &&
-        "response" in err &&
-        typeof (err as { response?: { data?: { message?: string } } }).response
-          ?.data?.message === "string"
-      ) {
-        errorMsg = (err as { response?: { data?: { message?: string } } })
-          .response!.data!.message!
-      } else if (err instanceof Error) {
-        errorMsg = err.message
-      }
-      setApiError(errorMsg)
+    } catch (err: any) {
+      setApiError(err?.message || "Failed to delete user.")
     } finally {
       setDeleteLoading(null)
     }
@@ -221,9 +175,7 @@ function Dashboard() {
             {activePage === "dashboard" && (
               <div className="space-y-6">
                 <div>
-                  <h2 className="mb-4 text-xl font-semibold">
-                    Users from API (Shadcn Card)
-                  </h2>
+                  <h2 className="mb-4 text-xl font-semibold">Users from API</h2>
                   {apiLoading ? (
                     <div className="flex min-h-[60vh] items-center justify-center">
                       <DotLoader size={60} color="#3A5B22" />
